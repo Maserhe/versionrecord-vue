@@ -5,7 +5,7 @@
       <Header></Header>
     </a-layout-header>
 
-    <a-layout-content style="background-color: rgb(255, 255, 255); min-height: 1000px;">
+    <a-layout-content style="background-color: rgb(255, 255, 255); min-height: 800px;">
       <router-view></router-view>
     </a-layout-content>
 
