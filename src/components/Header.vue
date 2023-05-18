@@ -1,7 +1,7 @@
 <template>
    <div style="width: 120px; height: 31px; margin-left: 30px; float: left; font-size: 28px; font-weight: 700; line-height: 60px;"><a href="/">见知数据</a></div>
    <!-- <div style="line-height: 58px; position: absolute; right: 80px; cursor: pointer;">Login</div> -->
-   <div style="line-height: 58px; position: absolute; right: 30px; cursor: pointer;" @click="dialogVisible = true">Login</div>
+   <div style="line-height: 58px; position: absolute; right: 30px; cursor: pointer;" @click="loginMsg=='Login'?dialogVisible=true:dialogVisible=false">{{ loginMsg }}</div>
 
 
    <el-dialog
@@ -28,7 +28,9 @@
 
 <script>
 import { ref } from 'vue';
-import { ElButton, ElDialog, ElForm, ElFormItem, ElInput, ElMessageBox } from 'element-plus';
+import { ElButton, ElDialog, ElForm, ElFormItem, ElInput, ElMessageBox, ElMessage } from 'element-plus';
+import { loginApi } from '../../api/data'
+
 export default {
     name: 'Header',
     components:{
@@ -45,13 +47,14 @@ export default {
             loginForm: {
                 username: '',
                 password: '',
-            }
+            },
         }
     },
 
     setup() {
         const current = ref(['home']);
         const dialogVisible = ref(false)
+        const loginMsg = ref("Login")
         const rules = {
             username: [
                 { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -65,7 +68,14 @@ export default {
             current,
             dialogVisible,
             rules,
+            loginMsg
         };
+    },
+
+    mounted() {
+        if (this.$store.getters.getUsername) {
+            this.loginMsg = this.$store.getters.getUsername
+        }
     },
 
     methods: {
@@ -85,7 +95,20 @@ export default {
             try {
                 // this.$refs.loginForm.validate();
                 // TODO：提交表单数据到后端进行验证
-                console.log('登陆成功！');
+                loginApi(this.loginForm).then(res=>{
+                    // console.log(res.headers.token)
+                    if (res.data.code == 200) {
+                        // console.log(this.$store.state.count)
+                        // document.cookie = "token=" + res.headers.token;
+                        ElMessage({type: 'success', message: '登陆成功!'})
+                        this.loginMsg = "admin"
+                        this.$store.commit("setToken", res.headers.token);
+                        this.$store.commit("setUserInfo", "admin");
+                    } else {
+                        ElMessage({type: 'error', message: res.data.message})
+                    }
+                    console.log(res.data)
+                })
                 this.dialogVisible = false;
             } catch (error) {
                 console.error(error);
