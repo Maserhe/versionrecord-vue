@@ -11,9 +11,9 @@ class HttpRequest {
     getInsideConfig() {
         const config = {
             baseUrl: this.baseUrl,
-            header: {}
+            header: {
+            }
         }
-        
         return config
     }
 
@@ -22,8 +22,12 @@ class HttpRequest {
         instance.interceptors.request.use(function (config) {
             // 在发送请求之前做些什么
             if (sessionStorage.getItem('token')) {
-                config.header.Authorization = sessionStorage.getItem('token')
+                config.headers["Authorization"] =  sessionStorage.getItem('token').replace(/\"/g, "")
+
+                //config.header.Authorization = sessionStorage.getItem('token')
             }
+
+            // console.log(sessionStorage.getItem('token') + " === ")
 
             return config;
         }, function (error) {
